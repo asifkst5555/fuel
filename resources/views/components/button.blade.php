@@ -1,4 +1,4 @@
-﻿@props([
+@props([
     'href' => null,
     'variant' => 'primary',
     'type' => 'button',

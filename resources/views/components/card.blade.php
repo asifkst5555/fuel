@@ -1,4 +1,4 @@
-﻿@props([
+@props([
     'title' => null,
     'subtitle' => null,
     'padding' => 'p-6',

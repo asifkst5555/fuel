@@ -14,6 +14,7 @@ class FuelStatus extends Model
     protected $fillable = [
         'station_id',
         'octane',
+        'petrol',
         'diesel',
     ];
 
@@ -21,6 +22,7 @@ class FuelStatus extends Model
     {
         return [
             'octane' => 'boolean',
+            'petrol' => 'boolean',
             'diesel' => 'boolean',
             'updated_at' => 'datetime',
         ];

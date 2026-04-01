@@ -21,6 +21,7 @@ class FuelStatusFactory extends Factory
         return [
             'station_id' => Station::factory(),
             'octane' => fake()->boolean(75),
+            'petrol' => fake()->boolean(60),
             'diesel' => fake()->boolean(65),
             'created_at' => now()->subMinutes(fake()->numberBetween(10, 180)),
             'updated_at' => now()->subMinutes(fake()->numberBetween(1, 30)),

@@ -16,6 +16,7 @@ class Station extends Model
     protected $fillable = [
         'name',
         'location',
+        'dealer',
     ];
 
     public function fuelStatus(): HasOne

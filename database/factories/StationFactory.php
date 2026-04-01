@@ -20,6 +20,7 @@ class StationFactory extends Factory
         return [
             'name' => fake()->company().' Fuel Station',
             'location' => fake()->city().', '.fake()->streetAddress(),
+            'dealer' => fake()->randomElement(['Jamuna', 'Meghna', 'Padma']),
         ];
     }
 }

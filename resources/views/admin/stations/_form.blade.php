@@ -4,10 +4,10 @@
     <div class="col-12">
         <div class="form-section">
             <div class="form-section-title">Basic Information</div>
-            <div class="form-section-copy">Define the station name and exact location used in both admin and public views.</div>
+            <div class="form-section-copy">Define the station name, dealer, and location used in both admin and public views.</div>
 
             <div class="row g-4">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                     <label for="name" class="form-label fw-semibold">Station Name</label>
                     <input
                         type="text"
@@ -22,7 +22,22 @@
                     @enderror
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-4">
+                    <label for="dealer" class="form-label fw-semibold">Dealer</label>
+                    <input
+                        type="text"
+                        name="dealer"
+                        id="dealer"
+                        class="form-control @error('dealer') is-invalid @enderror"
+                        value="{{ old('dealer', $station->dealer) }}"
+                        placeholder="Jamuna / Meghna / Padma"
+                    >
+                    @error('dealer')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="col-lg-4">
                     <label for="location" class="form-label fw-semibold">Location</label>
                     <input
                         type="text"
@@ -46,7 +61,7 @@
             <div class="form-section-copy">Toggle current availability so the public dashboard stays accurate in real time.</div>
 
             <div class="row g-4">
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                     <div class="switch-card">
                         <div class="form-check form-switch m-0">
                             <input
@@ -64,7 +79,25 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+                <div class="col-lg-4">
+                    <div class="switch-card">
+                        <div class="form-check form-switch m-0">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                role="switch"
+                                id="petrol"
+                                name="petrol"
+                                value="1"
+                                @checked(old('petrol', $status?->petrol))
+                            >
+                            <label class="form-check-label fw-semibold" for="petrol">Petrol Available</label>
+                        </div>
+                        <div class="small text-secondary mt-2">Enable this if petrol is currently available at the station.</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
                     <div class="switch-card">
                         <div class="form-check form-switch m-0">
                             <input

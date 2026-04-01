@@ -19,6 +19,7 @@ class UpdateFuelStatusRequest extends FormRequest
     {
         return [
             'octane' => ['required', 'boolean'],
+            'petrol' => ['required', 'boolean'],
             'diesel' => ['required', 'boolean'],
         ];
     }
@@ -27,6 +28,7 @@ class UpdateFuelStatusRequest extends FormRequest
     {
         $this->merge([
             'octane' => $this->boolean('octane'),
+            'petrol' => $this->boolean('petrol'),
             'diesel' => $this->boolean('diesel'),
         ]);
     }

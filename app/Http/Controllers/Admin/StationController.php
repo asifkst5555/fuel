@@ -32,7 +32,8 @@ class StationController extends Controller
                 $query->where(function ($innerQuery) use ($search): void {
                     $innerQuery
                         ->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('location', 'like', '%'.$search.'%');
+                        ->orWhere('location', 'like', '%'.$search.'%')
+                        ->orWhere('dealer', 'like', '%'.$search.'%');
                 });
             })
             ->latest()
@@ -42,6 +43,7 @@ class StationController extends Controller
         $summary = [
             'total' => $stationIds->count(),
             'octane_available' => FuelStatus::query()->whereIn('station_id', $stationIds)->where('octane', true)->count(),
+            'petrol_available' => FuelStatus::query()->whereIn('station_id', $stationIds)->where('petrol', true)->count(),
             'diesel_available' => FuelStatus::query()->whereIn('station_id', $stationIds)->where('diesel', true)->count(),
             'updated_today' => FuelStatus::query()->whereIn('station_id', $stationIds)->whereDate('updated_at', today())->count(),
         ];
@@ -92,8 +94,8 @@ class StationController extends Controller
 
         $chartData = [
             'fuel' => [
-                'labels' => ['Octane', 'Diesel', 'Updated Today'],
-                'values' => [$summary['octane_available'], $summary['diesel_available'], $summary['updated_today']],
+                'labels' => ['Octane', 'Petrol', 'Diesel', 'Updated Today'],
+                'values' => [$summary['octane_available'], $summary['petrol_available'], $summary['diesel_available'], $summary['updated_today']],
             ],
             'crowd' => [
                 'labels' => ['Low', 'Medium', 'High', 'Severe'],
@@ -154,7 +156,8 @@ class StationController extends Controller
                 $query->whereHas('station', function (Builder $stationQuery) use ($search): void {
                     $stationQuery
                         ->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('location', 'like', '%'.$search.'%');
+                        ->orWhere('location', 'like', '%'.$search.'%')
+                        ->orWhere('dealer', 'like', '%'.$search.'%');
                 });
             })
             ->when($dateFrom, fn (Builder $query, string $dateFrom) => $query->whereDate('created_at', '>=', $dateFrom))
@@ -238,7 +241,7 @@ class StationController extends Controller
         return response()->streamDownload(function (): void {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['Station Name', 'Location', 'Octane', 'Diesel', 'Latest Crowd', 'Fuel Updated At']);
+            fputcsv($handle, ['Station Name', 'Location', 'Dealer', 'Octane', 'Petrol', 'Diesel', 'Latest Crowd', 'Fuel Updated At']);
 
             Station::query()
                 ->with(['fuelStatus', 'latestCrowdReport'])
@@ -248,7 +251,9 @@ class StationController extends Controller
                     fputcsv($handle, [
                         $station->name,
                         $station->location,
+                        $station->dealer ?? 'N/A',
                         $station->fuelStatus?->octane ? 'Yes' : 'No',
+                        $station->fuelStatus?->petrol ? 'Yes' : 'No',
                         $station->fuelStatus?->diesel ? 'Yes' : 'No',
                         CrowdReport::labels()[$station->latestCrowdReport?->crowd_level] ?? 'N/A',
                         $station->fuelStatus?->updated_at?->format('Y-m-d H:i:s') ?? 'N/A',
@@ -272,10 +277,11 @@ class StationController extends Controller
     {
         $this->ensureAdmin();
 
-        $station = Station::create($request->safe()->only(['name', 'location']));
+        $station = Station::create($request->safe()->only(['name', 'location', 'dealer']));
 
         $station->fuelStatus()->create([
             'octane' => $request->boolean('octane'),
+            'petrol' => $request->boolean('petrol'),
             'diesel' => $request->boolean('diesel'),
         ]);
 
@@ -286,7 +292,9 @@ class StationController extends Controller
             metadata: [
                 'name' => $station->name,
                 'location' => $station->location,
+                'dealer' => $station->dealer,
                 'octane' => $request->boolean('octane'),
+                'petrol' => $request->boolean('petrol'),
                 'diesel' => $request->boolean('diesel'),
             ],
         );
@@ -309,14 +317,15 @@ class StationController extends Controller
     {
         $this->ensureAdmin();
 
-        $before = $station->only(['name', 'location']);
+        $before = $station->only(['name', 'location', 'dealer']);
 
-        $station->update($request->safe()->only(['name', 'location']));
+        $station->update($request->safe()->only(['name', 'location', 'dealer']));
 
         $station->fuelStatus()->updateOrCreate(
             ['station_id' => $station->id],
             [
                 'octane' => $request->boolean('octane'),
+                'petrol' => $request->boolean('petrol'),
                 'diesel' => $request->boolean('diesel'),
             ]
         );
@@ -330,7 +339,9 @@ class StationController extends Controller
                 'after' => [
                     'name' => $station->name,
                     'location' => $station->location,
+                    'dealer' => $station->dealer,
                     'octane' => $request->boolean('octane'),
+                    'petrol' => $request->boolean('petrol'),
                     'diesel' => $request->boolean('diesel'),
                 ],
             ],
@@ -347,6 +358,7 @@ class StationController extends Controller
 
         $previousStatus = [
             'octane' => (bool) $station->fuelStatus?->octane,
+            'petrol' => (bool) $station->fuelStatus?->petrol,
             'diesel' => (bool) $station->fuelStatus?->diesel,
         ];
 
@@ -378,6 +390,7 @@ class StationController extends Controller
         $snapshot = [
             'name' => $station->name,
             'location' => $station->location,
+            'dealer' => $station->dealer,
         ];
 
         $station->delete();

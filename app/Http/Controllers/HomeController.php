@@ -40,7 +40,9 @@ class HomeController extends Controller
                 'id' => $station->id,
                 'name' => $station->name,
                 'location' => $station->location,
+                'dealer' => $station->dealer,
                 'octane' => (bool) optional($status)->octane,
+                'petrol' => (bool) optional($status)->petrol,
                 'diesel' => (bool) optional($status)->diesel,
                 'crowd_level' => $crowd?->crowd_level,
                 'crowd_updated_human' => $crowd?->updated_at?->diffForHumans(),
@@ -62,7 +64,7 @@ class HomeController extends Controller
             'ip_address' => $request->ip(),
         ]);
 
-        return back()->with('crowd_feedback_status', 'আপনার ভিড় আপডেটটি সফলভাবে গ্রহণ করা হয়েছে।');
+        return back()->with('crowd_feedback_status', '????? ??? ??????? ??????? ????? ??? ??????');
     }
 
     protected function stationsQuery(Request $request): Builder
@@ -75,17 +77,21 @@ class HomeController extends Controller
                 $query->where(function (Builder $innerQuery) use ($search): void {
                     $innerQuery
                         ->where('name', 'like', '%'.$search.'%')
-                        ->orWhere('location', 'like', '%'.$search.'%');
+                        ->orWhere('location', 'like', '%'.$search.'%')
+                        ->orWhere('dealer', 'like', '%'.$search.'%');
                 });
             })
             ->when($request->string('availability')->toString() === 'octane', function (Builder $query): void {
                 $query->whereHas('fuelStatus', fn (Builder $builder) => $builder->where('octane', true));
             })
+            ->when($request->string('availability')->toString() === 'petrol', function (Builder $query): void {
+                $query->whereHas('fuelStatus', fn (Builder $builder) => $builder->where('petrol', true));
+            })
             ->when($request->string('availability')->toString() === 'diesel', function (Builder $query): void {
                 $query->whereHas('fuelStatus', fn (Builder $builder) => $builder->where('diesel', true));
             })
-            ->when($request->string('availability')->toString() === 'both', function (Builder $query): void {
-                $query->whereHas('fuelStatus', fn (Builder $builder) => $builder->where('octane', true)->where('diesel', true));
+            ->when(in_array($request->string('availability')->toString(), ['all', 'both'], true), function (Builder $query): void {
+                $query->whereHas('fuelStatus', fn (Builder $builder) => $builder->where('octane', true)->where('petrol', true)->where('diesel', true));
             })
             ->when($request->filled('crowd'), function (Builder $query) use ($request): void {
                 $query->whereHas('latestCrowdReport', function (Builder $builder) use ($request): void {

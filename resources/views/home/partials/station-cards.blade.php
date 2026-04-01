@@ -31,7 +31,7 @@
         @php
             $status = $station->fuelStatus;
             $crowd = $station->latestCrowdReport;
-            $hasAnyFuel = $status && ($status->octane || $status->diesel);
+            $hasAnyFuel = $status && ($status->octane || $status->petrol || $status->diesel);
             $statusLabel = $hasAnyFuel ? 'সরবরাহ চালু' : 'সরবরাহ বন্ধ';
             $statusClass = $hasAnyFuel ? 'status-available' : 'status-unavailable';
             $octaneText = $status?->octane ? 'আছে' : 'নেই';
@@ -65,39 +65,43 @@
             <div class="station-body">
                 <div class="status-grid">
                     <div class="status-box">
-                        <div class="status-label">অকটেন</div>
+                        <div class="status-label">&#x0985;&#x0995;&#x099F;&#x09C7;&#x09A8;</div>
                         <div class="status-value {{ $status?->octane ? 'available' : 'unavailable' }}">{{ $octaneText }}</div>
                     </div>
                     <div class="status-box">
-                        <div class="status-label">ডিজেল</div>
+                        <div class="status-label">&#x09AA;&#x09C7;&#x099F;&#x09CD;&#x09B0;&#x09CB;&#x09B2;</div>
+                        <div class="status-value {{ $status?->petrol ? 'available' : 'unavailable' }}">{{ $status?->petrol ? $octaneText : $dieselText }}</div>
+                    </div>
+                    <div class="status-box">
+                        <div class="status-label">&#x09A1;&#x09BF;&#x099C;&#x09C7;&#x09B2;</div>
                         <div class="status-value {{ $status?->diesel ? 'available' : 'unavailable' }}">{{ $dieselText }}</div>
                     </div>
                 </div>
 
                 <div class="detail-list">
-                    <div class="detail-row">
-                        <div class="detail-icon">
+                    <div class="detail-row detail-card-supply">
+                        <div class="detail-icon detail-icon-supply">
                             <i class="bi bi-droplet-half"></i>
                         </div>
                         <div>
                             <div class="detail-title">বর্তমান সরবরাহ</div>
-                            <div class="detail-value">অকটেন {{ $octaneText }} এবং ডিজেল {{ $dieselText }}।</div>
+                            <div class="detail-value">Octane {{ $octaneText }}, Petrol {{ $status?->petrol ? $octaneText : $dieselText }}, Diesel {{ $dieselText }}.</div>
                         </div>
                     </div>
 
-                    <div class="detail-row">
-                        <div class="detail-icon warning">
-                            <i class="bi bi-clipboard2-check-fill"></i>
+                    <div class="detail-row detail-card-dealer">
+                        <div class="detail-icon detail-icon-dealer">
+                            <i class="bi bi-person-badge-fill"></i>
                         </div>
                         <div>
-                            <div class="detail-title">স্টেশন নোট</div>
-                            <div class="detail-value">এই তথ্য লাইভ স্ট্যাটাস আপডেট থেকে নেওয়া হয়েছে।</div>
-                            <div class="detail-meta">সর্বশেষ স্টেশন ডেটা: {{ $status?->updated_at?->locale('bn')->diffForHumans() ?? 'এখনও আপডেট হয়নি' }}</div>
+                            <div class="detail-title">&#x09A1;&#x09BF;&#x09B2;&#x09BE;&#x09B0;</div>
+                            <div class="detail-value">&#x09A1;&#x09BF;&#x09B2;&#x09BE;&#x09B0;: {{ $station->dealer ?? 'No info' }}</div>
+                            <div class="detail-meta">Station dealer info</div>
                         </div>
                     </div>
 
-                    <div class="detail-row">
-                        <div class="detail-icon success">
+                    <div class="detail-row detail-card-crowd">
+                        <div class="detail-icon detail-icon-crowd">
                             <i class="bi {{ $crowdInfo['icon'] ?? 'bi-people-fill' }}"></i>
                         </div>
                         <div>
@@ -113,6 +117,7 @@
                 <div class="station-meta">
                     <div class="meta-list">
                         <span class="meta-chip"><i class="bi bi-clock-history"></i> {{ $status?->updated_at?->format('h:i A') ?? 'N/A' }}</span>
+                        <span class="meta-chip"><i class="bi bi-person-badge"></i> {{ $station->dealer ?? 'Dealer unavailable' }}</span>
                         <span class="meta-chip">স্টেশন আইডি: <span class="bn-numeral">{{ $bnNumber($station->id) }}</span></span>
                     </div>
 

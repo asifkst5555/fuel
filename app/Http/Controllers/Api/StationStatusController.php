@@ -21,8 +21,10 @@ class StationStatusController extends Controller
                     'id' => $station->id,
                     'name' => $station->name,
                     'location' => $station->location,
+                    'dealer' => $station->dealer,
                     'fuel_status' => [
                         'octane' => (bool) optional($status)->octane,
+                        'petrol' => (bool) optional($status)->petrol,
                         'diesel' => (bool) optional($status)->diesel,
                     ],
                     'updated_at' => optional($status?->updated_at)->toIso8601String(),

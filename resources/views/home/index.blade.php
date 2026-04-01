@@ -3,7 +3,7 @@
 @php
     $bnNumber = fn ($value) => strtr((string) $value, ['0' => '০', '1' => '১', '2' => '২', '3' => '৩', '4' => '৪', '5' => '৫', '6' => '৬', '7' => '৭', '8' => '৮', '9' => '৯']);
     $totalStations = $stations->count();
-    $availableCount = $stations->filter(fn ($station) => $station->fuelStatus && ($station->fuelStatus->octane || $station->fuelStatus->diesel))->count();
+    $availableCount = $stations->filter(fn ($station) => $station->fuelStatus && ($station->fuelStatus->octane || $station->fuelStatus->petrol || $station->fuelStatus->diesel))->count();
     $updatedCount = $stations->filter(fn ($station) => $station->fuelStatus?->updated_at)->count();
     $params = request()->query();
     $feedParams = request()->only(['search', 'availability', 'crowd', 'sort']);
@@ -12,7 +12,7 @@
 @section('content')
     <div class="container-shell">
         @if (session('crowd_feedback_status'))
-            <div class="alert alert-success border-0 shadow-sm rounded-4 mt-4 mb-0" role="alert">
+            <div class="alert alert-success border-0 rounded-4 mt-4 mb-0" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>{{ session('crowd_feedback_status') }}
             </div>
         @endif
@@ -23,13 +23,11 @@
                     <div>
                         <div class="hero-kicker">
                             <i class="bi bi-activity"></i>
-                            হাটহাজারী উপজেলার লাইভ ফুয়েল মনিটরিং
+                            হাটহাজারীর লাইভ ফুয়েল মনিটরিং
                         </div>
 
-                        <h1 class="hero-title">অকটেন ও ডিজেলের বর্তমান সরবরাহ এক নজরে দেখুন</h1>
-                        <p class="hero-copy">
-                            হাটহাজারীর স্টেশনভিত্তিক জ্বালানি পরিস্থিতি, সর্বশেষ আপডেট এবং জনসাধারণের লাইনের তথ্য একটি পরিচ্ছন্ন ও দ্রুত আপডেট হওয়া ইন্টারফেসে দেখা যাচ্ছে।
-                        </p>
+                        <h1 class="hero-title">অকটেন, পেট্রোল ও ডিজেলের বর্তমান সরবরাহ এক নজরে দেখুন</h1>
+                        <p class="hero-copy">স্টেশনভিত্তিক জ্বালানি সরবরাহ, ডিলার তথ্য, সর্বশেষ আপডেট এবং জনসাধারণের ভিড়ের তথ্য এখন আরও দ্রুত ও সহজভাবে দেখা যাচ্ছে।</p>
 
                         <div class="hero-stats">
                             <div class="stat-card">
@@ -40,7 +38,7 @@
                             <div class="stat-card">
                                 <div class="stat-label">সক্রিয় সরবরাহ</div>
                                 <div class="stat-value bn-numeral" style="color: var(--success);">{{ $bnNumber($availableCount) }}</div>
-                                <div class="stat-meta">অকটেন বা ডিজেল পাওয়া যাচ্ছে</div>
+                                <div class="stat-meta">অকটেন, পেট্রোল বা ডিজেল পাওয়া যাচ্ছে</div>
                             </div>
                             <div class="stat-card">
                                 <div class="stat-label">আপডেটেড রেকর্ড</div>
@@ -53,32 +51,19 @@
                     <aside class="search-panel">
                         <div class="panel-label">দ্রুত অনুসন্ধান</div>
                         <div class="panel-title">স্টেশন খুঁজুন</div>
-                        <div class="panel-copy">স্টেশনের নাম বা লোকেশন দিয়ে দ্রুত স্ট্যাটাস দেখুন। এই তালিকা প্রতি ১৫ সেকেন্ডে স্বয়ংক্রিয়ভাবে রিফ্রেশ হয়।</div>
+                        <div class="panel-copy">স্টেশনের নাম, লোকেশন বা ডিলারের নাম লিখে দ্রুত বর্তমান স্ট্যাটাস দেখুন। তালিকাটি প্রতি ১৫ সেকেন্ডে স্বয়ংক্রিয়ভাবে রিফ্রেশ হয়।</div>
 
                         <form method="GET" action="{{ route('home') }}" class="search-form">
                             <div class="input-group input-group-lg">
-                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                                <input
-                                    type="text"
-                                    id="search"
-                                    name="search"
-                                    value="{{ $search }}"
-                                    class="form-control border-start-0"
-                                    placeholder="স্টেশন নাম বা লোকেশন লিখুন"
-                                >
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" id="search" name="search" value="{{ $search }}" class="form-control" placeholder="স্টেশন, লোকেশন বা ডিলার লিখুন">
                                 <button class="btn btn-primary" type="submit">অনুসন্ধান</button>
                             </div>
                         </form>
 
-                        <div class="d-flex flex-wrap gap-2 mt-3">
-                            <div class="refresh-note">
-                                <span class="live-dot"></span>
-                                প্রতি ১৫ সেকেন্ডে রিফ্রেশ
-                            </div>
-                            <div class="refresh-note">
-                                <i class="bi bi-shield-check"></i>
-                                স্থানীয় মনিটরিং ডেটা
-                            </div>
+                        <div class="d-flex flex-wrap gap-2 mt-3 justify-content-center justify-content-lg-start">
+                            <div class="refresh-note"><span class="live-dot"></span> প্রতি ১৫ সেকেন্ডে রিফ্রেশ</div>
+                            <div class="refresh-note"><i class="bi bi-person-badge"></i> ডিলার তথ্য যুক্ত হয়েছে</div>
                         </div>
                     </aside>
                 </div>
@@ -89,12 +74,9 @@
             <div class="section-header">
                 <div>
                     <h2 class="section-title">হাটহাজারী ফুয়েল স্টেশন তালিকা</h2>
-                    <p class="section-copy">বর্তমান জ্বালানি সরবরাহ, জনসাধারণের লাইনের অবস্থা এবং সর্বশেষ আপডেট সময় এখানে দেখানো হচ্ছে।</p>
+                    <p class="section-copy">বর্তমান জ্বালানি সরবরাহ, ডিলার, লাইনের অবস্থা এবং সর্বশেষ আপডেট এখানে দেখানো হচ্ছে।</p>
                 </div>
-                <div class="refresh-note">
-                    <span class="live-dot"></span>
-                    লাইভ আপডেট সক্রিয়
-                </div>
+                <div class="refresh-note"><span class="live-dot"></span> লাইভ আপডেট সক্রিয়</div>
             </div>
 
             <div class="filter-shell">
@@ -102,18 +84,17 @@
 
                 <form method="GET" action="{{ route('home') }}" class="mobile-filter-panel">
                     <input type="hidden" name="search" value="{{ $search }}">
-
                     <div class="mobile-filter-grid">
                         <div class="mobile-filter-field">
                             <label for="availability_mobile">জ্বালানি</label>
                             <select id="availability_mobile" name="availability" class="form-select">
                                 <option value="" @selected(empty($availability))>সব স্টেশন</option>
                                 <option value="octane" @selected($availability === 'octane')>শুধু অকটেন</option>
+                                <option value="petrol" @selected($availability === 'petrol')>শুধু পেট্রোল</option>
                                 <option value="diesel" @selected($availability === 'diesel')>শুধু ডিজেল</option>
-                                <option value="both" @selected($availability === 'both')>দুইটিই আছে</option>
+                                <option value="all" @selected($availability === 'all' || $availability === 'both')>তিনটিই আছে</option>
                             </select>
                         </div>
-
                         <div class="mobile-filter-field">
                             <label for="crowd_mobile">ভিড়</label>
                             <select id="crowd_mobile" name="crowd" class="form-select">
@@ -122,7 +103,6 @@
                                 <option value="high" @selected($crowd === 'high')>ভিড় বেশি</option>
                             </select>
                         </div>
-
                         <div class="mobile-filter-field">
                             <label for="sort_mobile">সাজানো</label>
                             <select id="sort_mobile" name="sort" class="form-select">
@@ -131,7 +111,6 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="mobile-filter-actions">
                         <button type="submit" class="btn btn-primary">ফিল্টার প্রয়োগ</button>
                         <a href="{{ route('home', ['search' => $search]) }}" class="btn btn-outline-secondary">রিসেট</a>
@@ -139,30 +118,15 @@
                 </form>
 
                 <div class="filter-bar desktop-filter-bar">
-                    <a href="{{ route('home', array_merge($params, ['availability' => null])) }}" class="filter-chip {{ empty($availability) ? 'active' : '' }}">
-                        <i class="bi bi-grid-3x3-gap-fill"></i> সব স্টেশন
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['availability' => 'octane'])) }}" class="filter-chip {{ $availability === 'octane' ? 'active' : '' }}">
-                        <i class="bi bi-droplet-fill"></i> শুধু অকটেন
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['availability' => 'diesel'])) }}" class="filter-chip {{ $availability === 'diesel' ? 'active' : '' }}">
-                        <i class="bi bi-fuel-pump-diesel-fill"></i> শুধু ডিজেল
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['availability' => 'both'])) }}" class="filter-chip {{ $availability === 'both' ? 'active' : '' }}">
-                        <i class="bi bi-check2-circle"></i> দুইটিই আছে
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['crowd' => 'low'])) }}" class="filter-chip {{ $crowd === 'low' ? 'active' : '' }}">
-                        <i class="bi bi-bicycle"></i> ভিড় কম
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['crowd' => 'high'])) }}" class="filter-chip {{ $crowd === 'high' ? 'active' : '' }}">
-                        <i class="bi bi-people-fill"></i> ভিড় বেশি
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['sort' => 'updated'])) }}" class="filter-chip {{ $sort === 'updated' ? 'active' : '' }}">
-                        <i class="bi bi-clock-history"></i> নতুন আপডেট আগে
-                    </a>
-                    <a href="{{ route('home', array_merge($params, ['sort' => 'name'])) }}" class="filter-chip {{ empty($sort) || $sort === 'name' ? 'active' : '' }}">
-                        <i class="bi bi-sort-alpha-down"></i> নাম অনুযায়ী
-                    </a>
+                    <a href="{{ route('home', array_merge($params, ['availability' => null])) }}" class="filter-chip {{ empty($availability) ? 'active' : '' }}"><i class="bi bi-grid-3x3-gap-fill"></i> সব স্টেশন</a>
+                    <a href="{{ route('home', array_merge($params, ['availability' => 'octane'])) }}" class="filter-chip {{ $availability === 'octane' ? 'active' : '' }}"><i class="bi bi-droplet-fill"></i> শুধু অকটেন</a>
+                    <a href="{{ route('home', array_merge($params, ['availability' => 'petrol'])) }}" class="filter-chip {{ $availability === 'petrol' ? 'active' : '' }}"><i class="bi bi-fire"></i> শুধু পেট্রোল</a>
+                    <a href="{{ route('home', array_merge($params, ['availability' => 'diesel'])) }}" class="filter-chip {{ $availability === 'diesel' ? 'active' : '' }}"><i class="bi bi-fuel-pump-diesel-fill"></i> শুধু ডিজেল</a>
+                    <a href="{{ route('home', array_merge($params, ['availability' => 'all'])) }}" class="filter-chip {{ $availability === 'all' || $availability === 'both' ? 'active' : '' }}"><i class="bi bi-check2-circle"></i> তিনটিই আছে</a>
+                    <a href="{{ route('home', array_merge($params, ['crowd' => 'low'])) }}" class="filter-chip {{ $crowd === 'low' ? 'active' : '' }}"><i class="bi bi-bicycle"></i> ভিড় কম</a>
+                    <a href="{{ route('home', array_merge($params, ['crowd' => 'high'])) }}" class="filter-chip {{ $crowd === 'high' ? 'active' : '' }}"><i class="bi bi-people-fill"></i> ভিড় বেশি</a>
+                    <a href="{{ route('home', array_merge($params, ['sort' => 'updated'])) }}" class="filter-chip {{ $sort === 'updated' ? 'active' : '' }}"><i class="bi bi-clock-history"></i> নতুন আপডেট আগে</a>
+                    <a href="{{ route('home', array_merge($params, ['sort' => 'name'])) }}" class="filter-chip {{ empty($sort) || $sort === 'name' ? 'active' : '' }}"><i class="bi bi-sort-alpha-down"></i> নাম অনুযায়ী</a>
                 </div>
             </div>
 
@@ -175,17 +139,13 @@
             <div class="footer-panel">
                 <div class="hero-kicker justify-content-center d-inline-flex mb-3">তথ্য তদারকিতে</div>
                 <h3 class="section-title">হাটহাজারী ফুয়েল মনিটরিং কন্ট্রোল সেল</h3>
-                <p class="section-copy mt-2">হাটহাজারী উপজেলার স্থানীয় মনিটরিং, স্টেশন আপডেট এবং জনসাধারণের ফিডব্যাক সমন্বয়ে পরিচালিত।</p>
-
+                <p class="section-copy mt-2">স্থানীয় মনিটরিং, স্টেশন আপডেট এবং জনসাধারণের ফিডব্যাক সমন্বয়ে পরিচালিত।</p>
                 <div class="info-strip">
-                    <div class="info-chip"><i class="bi bi-shield-check text-success"></i> নির্ভরযোগ্য ডেটা</div>
-                    <div class="info-chip"><i class="bi bi-phone text-primary"></i> মোবাইল ফ্রেন্ডলি</div>
-                    <div class="info-chip"><i class="bi bi-lightning-charge text-warning"></i> দ্রুত রিফ্রেশ</div>
+                    <div class="info-chip"><i class="bi bi-person-badge text-success"></i> ডিলার তথ্য</div>
+                    <div class="info-chip"><i class="bi bi-fuel-pump text-primary"></i> পেট্রোল স্ট্যাটাস</div>
+                    <div class="info-chip"><i class="bi bi-lightning-charge text-primary"></i> দ্রুত রিফ্রেশ</div>
                 </div>
-
-                <div class="notice-box">
-                    এই পেইজে দেখানো তথ্য স্থানীয় আপডেট ও স্টেশনভিত্তিক পর্যবেক্ষণের ভিত্তিতে প্রকাশ করা হয়। সরবরাহ পরিস্থিতি যেকোনো সময় পরিবর্তিত হতে পারে, তাই প্রয়োজন হলে স্টেশনের সঙ্গে সরাসরি যোগাযোগ করা উত্তম।
-                </div>
+                <div class="notice-box">এই পেইজের তথ্য স্থানীয় আপডেট ও স্টেশনভিত্তিক পর্যবেক্ষণের ভিত্তিতে প্রকাশ করা হয়। সরবরাহ পরিস্থিতি যেকোনো সময় পরিবর্তিত হতে পারে, তাই প্রয়োজনে স্টেশনের সঙ্গে সরাসরি যোগাযোগ করা উত্তম।</div>
             </div>
         </section>
     </div>
@@ -195,11 +155,7 @@
     <script>
         (() => {
             const cardsContainer = document.getElementById('station-cards');
-
-            if (!cardsContainer) {
-                return;
-            }
-
+            if (!cardsContainer) return;
             const refresh = async () => {
                 try {
                     const response = await fetch(cardsContainer.dataset.feedUrl, {
@@ -207,17 +163,12 @@
                             'X-Requested-With': 'XMLHttpRequest',
                         },
                     });
-
-                    if (!response.ok) {
-                        return;
-                    }
-
+                    if (!response.ok) return;
                     cardsContainer.innerHTML = await response.text();
                 } catch (error) {
                     console.error('Station auto-refresh failed.', error);
                 }
             };
-
             window.setInterval(refresh, 15000);
         })();
     </script>

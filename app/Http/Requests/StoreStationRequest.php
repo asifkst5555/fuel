@@ -20,7 +20,9 @@ class StoreStationRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],
+            'dealer' => ['nullable', 'string', 'max:255'],
             'octane' => ['nullable', 'boolean'],
+            'petrol' => ['nullable', 'boolean'],
             'diesel' => ['nullable', 'boolean'],
         ];
     }
@@ -29,6 +31,7 @@ class StoreStationRequest extends FormRequest
     {
         $this->merge([
             'octane' => $this->boolean('octane'),
+            'petrol' => $this->boolean('petrol'),
             'diesel' => $this->boolean('diesel'),
         ]);
     }

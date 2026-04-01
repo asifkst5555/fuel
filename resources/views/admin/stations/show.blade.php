@@ -18,9 +18,12 @@
             <div class="insight-card">
                 <div class="insight-title">{{ $station->name }}</div>
                 <div class="insight-copy">{{ $station->location }}</div>
+                <div class="small text-secondary fw-semibold mb-3">Dealer: {{ $station->dealer ?? 'N/A' }}</div>
                 <div class="row g-3">
                     <div class="col-6"><div class="summary-card"><div class="summary-label">Octane</div><div class="summary-value {{ $station->fuelStatus?->octane ? 'text-success' : 'text-danger' }}">{{ $station->fuelStatus?->octane ? 'Yes' : 'No' }}</div></div></div>
+                    <div class="col-6"><div class="summary-card"><div class="summary-label">Petrol</div><div class="summary-value {{ $station->fuelStatus?->petrol ? 'text-success' : 'text-danger' }}">{{ $station->fuelStatus?->petrol ? 'Yes' : 'No' }}</div></div></div>
                     <div class="col-6"><div class="summary-card"><div class="summary-label">Diesel</div><div class="summary-value {{ $station->fuelStatus?->diesel ? 'text-success' : 'text-danger' }}">{{ $station->fuelStatus?->diesel ? 'Yes' : 'No' }}</div></div></div>
+                    <div class="col-6"><div class="summary-card"><div class="summary-label">Updated</div><div class="summary-value" style="font-size:1.1rem;">{{ $station->fuelStatus?->updated_at?->diffForHumans() ?? 'N/A' }}</div></div></div>
                     <div class="col-12"><div class="summary-card"><div class="summary-label">Latest Crowd</div><div class="summary-value" style="font-size:1.3rem;">{{ $crowdLabels[$station->latestCrowdReport?->crowd_level] ?? 'No report yet' }}</div><div class="small text-secondary mt-2">{{ $station->latestCrowdReport?->created_at?->diffForHumans() ?? 'Awaiting public reports' }}</div></div></div>
                     @if ($isAdmin)
                         <div class="col-12"><div class="summary-card"><div class="summary-label">Assigned Users</div>@forelse ($station->users as $user)<div class="small fw-semibold mb-2">{{ $user->name }} <span class="text-secondary">({{ $user->email }})</span></div>@empty<div class="small text-secondary">No station manager assigned yet.</div>@endforelse</div></div>
@@ -45,12 +48,12 @@
                 <div class="panel-body">
                     <div class="table-responsive">
                         <table class="table align-middle">
-                            <thead><tr><th>Octane</th><th>Diesel</th><th>Updated</th></tr></thead>
+                            <thead><tr><th>Octane</th><th>Petrol</th><th>Diesel</th><th>Updated</th></tr></thead>
                             <tbody>
                                 @forelse ($fuelTimeline as $item)
-                                    <tr><td>{{ $item->octane ? 'Available' : 'Not Available' }}</td><td>{{ $item->diesel ? 'Available' : 'Not Available' }}</td><td><div>{{ $item->updated_at?->diffForHumans() }}</div><div class="small text-secondary">{{ $item->updated_at?->format('d M Y, h:i A') }}</div></td></tr>
+                                    <tr><td>{{ $item->octane ? 'Available' : 'Not Available' }}</td><td>{{ $item->petrol ? 'Available' : 'Not Available' }}</td><td>{{ $item->diesel ? 'Available' : 'Not Available' }}</td><td><div>{{ $item->updated_at?->diffForHumans() }}</div><div class="small text-secondary">{{ $item->updated_at?->format('d M Y, h:i A') }}</div></td></tr>
                                 @empty
-                                    <tr><td colspan="3" class="text-center text-secondary py-4">No fuel history available.</td></tr>
+                                    <tr><td colspan="4" class="text-center text-secondary py-4">No fuel history available.</td></tr>
                                 @endforelse
                             </tbody>
                         </table>
