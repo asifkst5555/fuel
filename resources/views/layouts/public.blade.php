@@ -4,7 +4,17 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $title ?? '&#x09B9;&#x09BE;&#x099F;&#x09B9;&#x09BE;&#x099C;&#x09BE;&#x09B0;&#x09C0; &#x09AB;&#x09C1;&#x09DF;&#x09C7;&#x09B2; &#x09AE;&#x09A8;&#x09BF;&#x099F;&#x09B0; &#x09B8;&#x09BF;&#x09B8;&#x09CD;&#x099F;&#x09C7;&#x09AE;' }}</title>
+        <title>{{ $title ?? 'হাটহাজারী ফুয়েল মনিটর সিস্টেম' }}</title>
+        <meta name="description" content="হাটহাজারী উপজেলা, চট্টগ্রামের লাইভ স্টেশন মনিটরিং। অকটেন, পেট্রোল ও ডিজেলের বর্তমান সরবরাহ এক নজরে দেখুন।">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="হাটহাজারী ফুয়েল মনিটর সিস্টেম">
+        <meta property="og:description" content="হাটহাজারী উপজেলা, চট্টগ্রামের লাইভ স্টেশন মনিটরিং। অকটেন, পেট্রোল ও ডিজেলের বর্তমান সরবরাহ এক নজরে দেখুন।">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:image" content="{{ asset('favicon.ico') }}">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="হাটহাজারী ফুয়েল মনিটর সিস্টেম">
+        <meta name="twitter:description" content="হাটহাজারী উপজেলা, চট্টগ্রামের লাইভ স্টেশন মনিটরিং। অকটেন, পেট্রোল ও ডিজেলের বর্তমান সরবরাহ এক নজরে দেখুন।">
+        <meta name="twitter:image" content="{{ asset('favicon.ico') }}">
         <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
         <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
         <link rel="preconnect" href="https://fonts.googleapis.com">
